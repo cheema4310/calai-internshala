@@ -1,0 +1,55 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .my-flex {
+    @apply flex justify-center items-center;
+  }
+  .my-heading {
+    @apply font-modern font-bold text-3xl;
+  }
+  .my-heading-normal {
+    @apply font-heading font-semibold text-2xl;
+  }
+  .my-para {
+    @apply font-para font-normal text-base;
+  }
+  .my-btn {
+    @apply py-2 px-6 bg-dark text-lightest text-lg font-semibold rounded-lg shadow-lg transition hover:bg-darker;
+  }
+  .my-btn-light {
+    @apply py-2 px-6 bg-lightest text-darker text-center text-lg font-semibold rounded-lg shadow-md transition hover:bg-lighter;
+  }
+  .my-btn-outline {
+    @apply py-2 px-6 bg-transparent rounded-lg shadow-lg border border-dark transition hover:bg-darker hover:text-lightest hover:border-lightest;
+  }
+  .my-link {
+    @apply p-2 font-btn bg-transparent font-medium hover:text-lightest;
+  }
+  .my-navlink {
+    @apply p-2 text-xl bg-transparent font-bold font-modern;
+  }
+  .my-navlink-active {
+    @apply p-2 text-xl bg-transparent font-bold font-modern text-orange-600;
+  }
+  .my-social-icon {
+    @apply w-9 h-9 transition hover:scale-110;
+  }
+  .my-input {
+    @apply w-full p-2 font-medium font-para rounded-lg outline-none bg-lightest text-darkest placeholder:italic focus:bg-white;
+  }
+  .my-after {
+    @apply after:content-[""] inline-block  after:ml-0.5 after:w-10 after:h-2 after:top-1/2 after:bg-white;
+  }
+}
+
+/* google font */
+/* <weight>: Use a value from 100 to 900 */
+/* only Lato <weight> 400, 700, 900 */
+/* font-family: "Exo", sans-serif */
+/* font-family: "Nunito", sans-serif */
+/* font-family: "Open Sans", sans-serif */
+/* font-family: "Lato", sans-serif */
+
+@import url('https://fonts.googleapis.com/css2?family=Exo:wght@100..900&family=Lato:wght@400;700;900&family=Nunito:wght@200..1000&family=Open+Sans:wght@300..800&display=swap');
