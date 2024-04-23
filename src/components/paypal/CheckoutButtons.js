@@ -3,8 +3,6 @@ import { doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../db/firebase-config';
 
 export default function CheckoutButtons({ product }) {
-  const user = auth.currentUser;
-  console.log(user);
   const amount = product.price;
 
   const createOrder = (data, actions) => {

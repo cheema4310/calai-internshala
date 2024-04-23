@@ -20,6 +20,7 @@ export default function Register() {
     name: '',
     email: '',
     password: '',
+    msg: '',
   });
 
   const dispatch = useDispatch();
@@ -95,8 +96,11 @@ export default function Register() {
           })
         );
       }
+
+      navigate('/');
     } catch (error) {
       setLoading(false);
+      setErrors({ ...errors, msg: 'Email already in use' });
       console.log(error);
     }
     setUser({
@@ -104,8 +108,6 @@ export default function Register() {
       email: '',
       password: '',
     });
-
-    navigate('/');
   };
 
   return (
@@ -157,9 +159,14 @@ export default function Register() {
               </div>
             )}
           </div>
-          <button type="submit" className="my-btn-light w-full">
-            {loading ? <LoadingSpinner /> : 'Register'}
-          </button>
+          <div className="w-full relative">
+            <button type="submit" className="my-btn-light w-full">
+              {loading ? <LoadingSpinner /> : 'Register'}
+            </button>
+            {errors.msg && (
+              <div className="absolute text-red-500 pl-2">{errors.msg}</div>
+            )}
+          </div>
         </form>
 
         <div className="flex flex-col">
