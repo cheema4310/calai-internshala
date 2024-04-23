@@ -6,6 +6,8 @@ import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import { auth, db } from '../../db/firebase-config';
 import { createUserWithEmailAndPassword } from 'firebase/auth';
 import { setDoc, doc } from 'firebase/firestore';
+import { useDispatch } from 'react-redux';
+import { signin } from '../../store/auth-slice';
 
 export default function Register() {
   const [user, setUser] = useState({
@@ -20,6 +22,7 @@ export default function Register() {
     password: '',
   });
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleInput = (e) => {
@@ -38,7 +41,7 @@ export default function Register() {
     // Validate Inputs
 
     let newErrors = {};
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    const passwordRegex = /^.{8,}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     const nameRegex = /^[a-zA-Z\s]{3,}$/;
 
@@ -62,8 +65,7 @@ export default function Register() {
     if (!passwordRegex.test(user.password)) {
       newErrors = {
         ...newErrors,
-        password:
-          'Password must be at least 8 chars long and contain at least one uppercase, one lowercase, and a number.',
+        password: 'Password must be at least 8 chars long.',
       };
     }
 
@@ -77,6 +79,7 @@ export default function Register() {
     try {
       await createUserWithEmailAndPassword(auth, user.email, user.password);
       const currentUser = auth.currentUser;
+
       if (currentUser) {
         await setDoc(doc(db, 'Users', currentUser.uid), {
           name: user.name,
@@ -84,6 +87,13 @@ export default function Register() {
           password: user.password,
         });
         setLoading(false);
+
+        dispatch(
+          signin({
+            name: user.name,
+            email: user.email,
+          })
+        );
       }
     } catch (error) {
       setLoading(false);
@@ -100,9 +110,9 @@ export default function Register() {
 
   return (
     <AuthPagesLayout>
-      <div className="flex flex-col gap-12">
+      <div className="flex flex-col gap-10">
         <h2 className="my-heading text-lightest text-center">Register</h2>
-        <form onSubmit={handleSubmit} className="flex flex-col gap-7">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-8">
           <div>
             <input
               type="text"
@@ -114,7 +124,7 @@ export default function Register() {
               required
             />
             {errors.name && (
-              <div className="text-red-500 pl-2">{errors.name}</div>
+              <div className="absolute text-red-500 pl-2">{errors.name}</div>
             )}
           </div>
           <div>
@@ -142,7 +152,9 @@ export default function Register() {
               required
             />
             {errors.password && (
-              <div className=" text-red-500 pl-2">{errors.password}</div>
+              <div className="absolute text-red-500 pl-2">
+                {errors.password}
+              </div>
             )}
           </div>
           <button type="submit" className="my-btn-light w-full">

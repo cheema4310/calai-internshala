@@ -4,7 +4,11 @@ import { Link, useNavigate } from 'react-router-dom';
 import LoadingSpinner from '../../components/shared/LoadingSpinner';
 import AuthPagesLayout from '../../components/auth/AuthPagesLayout';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../db/firebase-config';
+import { auth, db } from '../../db/firebase-config';
+import { useDispatch } from 'react-redux';
+import { signin } from '../../store/auth-slice';
+import { doc } from 'firebase/firestore';
+import { getDoc } from 'firebase/firestore';
 
 export default function Login() {
   const [user, setUser] = useState({
@@ -12,8 +16,9 @@ export default function Login() {
     password: '',
   });
   const [loading, setLoading] = useState(false);
-  const [errors, setErrors] = useState({ email: '', password: '' });
+  const [errors, setErrors] = useState({ email: '', password: '', msg: '' });
 
+  const dispatch = useDispatch();
   const navigate = useNavigate();
 
   const handleInput = (e) => {
@@ -31,7 +36,7 @@ export default function Login() {
 
     // Validate Inputs
     let newErrors = {};
-    const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
+    const passwordRegex = /^.{8,}$/;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
     // Email Check
@@ -46,8 +51,7 @@ export default function Login() {
     if (!passwordRegex.test(user.password)) {
       newErrors = {
         ...newErrors,
-        password:
-          'password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, and one number.',
+        password: 'password must be at least 8 characters long',
       };
     }
 
@@ -62,14 +66,28 @@ export default function Login() {
     try {
       await signInWithEmailAndPassword(auth, user.email, user.password);
       const currentUser = auth.currentUser;
-      console.log(currentUser);
+      const docRef = doc(db, 'Users', currentUser.uid);
+      const docSnap = await getDoc(docRef);
+      if (!docSnap.exists()) {
+        setLoading(false);
+        return;
+      }
+      const userData = docSnap.data();
+      const { password, ...userWithoutPassword } = userData;
+      dispatch(signin(userWithoutPassword));
     } catch (error) {
       console.log(error);
+      setLoading(false);
+      setErrors({ ...errors, msg: 'Invalid email or password' });
+      return;
     }
+
+    setLoading(false);
     setUser({
       email: '',
       password: '',
     });
+    navigate('/');
   };
   return (
     <AuthPagesLayout>
@@ -107,6 +125,9 @@ export default function Login() {
           <button className="my-btn-light w-full">
             {loading ? <LoadingSpinner /> : 'Sign In'}
           </button>
+          {errors.msg && (
+            <div className="absolute text-red-500 pl-2">{errors.msg}</div>
+          )}
         </form>
         <div className="flex flex-col">
           <div className="text-center relative">
@@ -120,6 +141,10 @@ export default function Login() {
             Sign Up
           </Link>
         </div>
+      </div>
+      <div className="pt-4 text-lighter text-lg text-center  font-semibold">
+        Demo Account: <span className="text-glassOrange">a@b.com</span>,{' '}
+        <span className="text-glassOrange">12345678</span>
       </div>
     </AuthPagesLayout>
   );

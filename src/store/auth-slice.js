@@ -1,27 +1,35 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-// get stored auth state from localstorage
 const loadAuthState = () => {
   const authStateInStorage = window.localStorage.getItem('authState');
   if (authStateInStorage === null) {
-    return false;
+    return {
+      auth: false,
+      user: null,
+    };
   }
   return JSON.parse(authStateInStorage);
 };
 const savedAuthState = loadAuthState();
 
-// create slice for signin
 const authSlice = createSlice({
   initialState: savedAuthState,
   name: 'auth',
   reducers: {
-    signin(state) {
-      state = true;
-      window.localStorage.setItem('authState', JSON.stringify(state));
+    signin: (state, action) => {
+      const user = action.payload;
+      return {
+        ...state,
+        auth: true,
+        user: user,
+      };
     },
-    signout(state) {
-      state = false;
-      window.localStorage.setItem('authState', JSON.stringify(state));
+    signout: (state) => {
+      return {
+        ...state,
+        auth: false,
+        user: null,
+      };
     },
   },
 });
